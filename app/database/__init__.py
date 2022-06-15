@@ -11,11 +11,14 @@ async def init_pg(app):
     Init asyncpgsa driver (asyncpg + sqlalchemy)
     """
     app['pg'] = PG()
-    await app['pg'].init(PG_URL)
     try:
-        yield
-    finally:
-        await app['pg'].pool.close()
+        await app['pg'].init(PG_URL)
+        try:
+            yield
+        finally:
+            await app['pg'].pool.close()
+    except Exception as err:
+        print(f"Oops! Database not initiated {err=}, {type(err)=}")
 
 
 def setup(app: web.Application) -> _void:

@@ -9,10 +9,13 @@ from app.settings.conf import HOST, PORT
 
 
 def create_app() -> Application:
-    app = Application()
-    database.setup(app)
-    router.setup(app)
-    return app
+    try:
+        app = Application()
+        database.setup(app)
+        router.setup(app)
+        return app
+    except Exception as err:
+        print(f"Oops! Application no initiated {err=}, {type(err)=}")
 
 
 def run() -> _void:
