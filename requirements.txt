@@ -16,6 +16,8 @@ aioresponses==0.6.0
 typed_ast==1.5.4
 configargparse==1.5.3
 cchardet==2.1.7
+python-dotenv==0.20.0
 sqlalchemy==1.4.37
 asyncpgsa==0.27.1
-python-dotenv==0.20.0
+alembic==1.8.0
+psycopg2==2.9.3

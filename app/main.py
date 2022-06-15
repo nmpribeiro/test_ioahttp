@@ -1,22 +1,23 @@
 
 from inspect import _void
-from numbers import Number
+
 from aiohttp.web import Application, run_app
 
 from app import database
 from app import router
+from app.settings.conf import HOST, PORT
 
 
-def create_app(pg_url) -> Application:
+def create_app() -> Application:
     app = Application()
-    database.setup(app, pg_url)
+    database.setup(app)
     router.setup(app)
     return app
 
 
-def run(host: str, port: Number, pg_url: str) -> _void:
+def run() -> _void:
     """
     Run application.
     """
-    app = create_app(pg_url)
-    run_app(app, host=host, port=port)
+    app = create_app()
+    run_app(app, host=HOST, port=PORT)
