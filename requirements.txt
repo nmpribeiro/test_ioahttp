@@ -1,5 +1,6 @@
 aiohttp==3.8.1
 aiohttp-session==2.7.0
+aiodns==3.0.0
 mypy==0.961
 black==19.3b0
 flake8==3.7.7
@@ -14,3 +15,5 @@ trustme==0.5.1
 aioresponses==0.6.0
 # -e code/10-testing
 typed_ast==1.5.4
+configargparse==1.5.3
+cchardet==2.1.7
