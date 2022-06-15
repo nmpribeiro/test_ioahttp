@@ -1,0 +1,16 @@
+aiohttp==3.8.1
+aiohttp-session==2.7.0
+mypy==0.961
+black==19.3b0
+flake8==3.7.7
+isort==4.3.17
+sphinx>=5.0.1
+aiosqlite==0.10.0
+aiohttp-jinja2>=1.1.0
+pillow>=9.1.1
+click>=7.0
+pytest-aiohttp==0.3.0
+trustme==0.5.1
+aioresponses==0.6.0
+# -e code/10-testing
+typed_ast==1.5.4
