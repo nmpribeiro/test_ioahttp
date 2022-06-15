@@ -13,7 +13,9 @@ click>=7.0
 pytest-aiohttp==0.3.0
 trustme==0.5.1
 aioresponses==0.6.0
-# -e code/10-testing
 typed_ast==1.5.4
 configargparse==1.5.3
 cchardet==2.1.7
+sqlalchemy==1.4.37
+asyncpgsa==0.27.1
+python-dotenv==0.20.0
