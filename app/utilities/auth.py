@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import json
 import random
 import string
-from typing import Optional
 from aiohttp import web
 import aiohttp
 from aiohttp_session import get_session
@@ -64,11 +63,17 @@ async def reset_session(request: web.Request):
     session[SESSION.USER_KEY] = None
 
 
-async def is_auth(request: web.Request):
+async def is_auth(request: web.Request) -> bool:
     session = await get_session(request)
-    return session[SESSION.USER_KEY] != None
+    try:
+        return session[SESSION.USER_KEY] != None
+    except:
+        return False
 
 
 async def get_user(request: web.Request):
     session = await get_session(request)
-    return session[SESSION.USER_KEY]
+    try:
+        return session[SESSION.USER_KEY]
+    except:
+        return None
