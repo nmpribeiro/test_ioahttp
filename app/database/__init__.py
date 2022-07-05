@@ -1,25 +1,22 @@
-from functools import partial
-
-from aiohttp import web
-from asyncpgsa import PG
 from inspect import _void
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.declarative import declarative_base
+
 from app.settings.conf import PG_URL
 
+Base = declarative_base()
 
-async def init_pg(app):
-    """
-    Init asyncpgsa driver (asyncpg + sqlalchemy)
-    """
-    app['pg'] = PG()
-    try:
-        await app['pg'].init(PG_URL)
-        try:
-            yield
-        finally:
-            await app['pg'].pool.close()
-    except Exception as err:
-        print(f"Oops! Database not initiated {err=}, {type(err)=}")
+# https://jupyter-tutorial.readthedocs.io/de/latest/data-processing/postgresql/sqlalchemy.html
 
 
-def setup(app: web.Application) -> _void:
-    app.cleanup_ctx.append(partial(init_pg))
+def get_engine():
+    return create_engine(PG_URL, echo=True)
+
+
+def get_session():
+    return Session(get_engine())
+
+
+def setup() -> _void:
+    Base.metadata.create_all(get_engine())

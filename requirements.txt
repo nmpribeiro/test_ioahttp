@@ -1,5 +1,5 @@
 aiohttp==3.8.1
-aiohttp-session==2.7.0
+aiohttp-session==2.11.0
 aiodns==3.0.0
 mypy==0.961
 black==19.3b0
@@ -21,3 +21,4 @@ sqlalchemy==1.4.37
 asyncpgsa==0.27.1
 alembic==1.8.0
 psycopg2==2.9.3
+aioredis==2.0.1

@@ -8,3 +8,5 @@ PG_URL = str(os.getenv("PG_URL"))
 
 HOST = str(os.getenv("HOST"))
 PORT = int(os.getenv("PORT"))
+
+REDIS = str(os.getenv("REDIS"))

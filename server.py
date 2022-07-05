@@ -2,4 +2,7 @@ from app import main
 
 
 if __name__ == '__main__':
-    main.run()
+    try:
+        main.run()
+    except Exception as err:
+        print(f"Oops! Application exited")

@@ -1,11 +1,13 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import configure_mappers, declarative_base
 
+from app.models.base import ModelAdmin
+
 
 Base = declarative_base()
 
 
-class User(Base):
+class User(Base, ModelAdmin):
     __tablename__ = 'users'
 
     id = sa.Column(sa.Integer, primary_key=True)
