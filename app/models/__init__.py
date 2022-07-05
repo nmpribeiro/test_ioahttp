@@ -9,6 +9,7 @@ Base = declarative_base()
 
 
 # Taken from https://ahmed-nafies.medium.com/sqlalchemy-async-orm-is-finally-here-d560dfaa335d
+# https://jupyter-tutorial.readthedocs.io/de/latest/data-processing/postgresql/sqlalchemy.html
 
 class BaseModel():
     @abstractmethod

@@ -1,4 +1,7 @@
 from aiohttp import web
+from app.utilities import html_response
+
+from app.utilities.auth import get_user, is_auth
 
 
 routes = web.RouteTableDef()
@@ -6,7 +9,13 @@ routes = web.RouteTableDef()
 
 @routes.get('/')
 async def handler(request: web.Request) -> web.Response:
-    return web.Response(text="Hello world")
+    # return web.Response(text="Hello world")
+    if await is_auth(request):
+        user = await get_user(request)
+        text = f"Hello world, <br />user: {user['email']} <br /> <a href='/auth/logout'>logout</>"
+    else:
+        text = "Hello world, <br />user: NO USER <br /> <a href='/auth/login'>login</>"
+    return html_response(text)
 
 
 # @routes.get('/{username}')
