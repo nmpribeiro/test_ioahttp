@@ -20,10 +20,12 @@ async def handle_get_users(request: request):
     """
     Handler, creates new user
     """
+    # await User.create(name="John Doe", email="doe.j@test.com", user_id=1, id=1)
     users = await User.all()
     # s.query(Book)
     # query = select().select_from(User.__tablename__)
     # users = await pg.fetch(query)
+   
     return json_response(users, status=HTTPStatus.OK)
 
 

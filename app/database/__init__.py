@@ -1,6 +1,6 @@
 from inspect import _void
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from app.settings.conf import PG_URL
@@ -14,8 +14,12 @@ def get_engine():
     return create_engine(PG_URL, echo=True)
 
 
+# a sessionmaker(), also in the same scope as the engine
+Session = sessionmaker(get_engine())
+
+
 def get_session():
-    return Session(get_engine())
+    return Session
 
 
 def setup() -> _void:
