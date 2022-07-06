@@ -1,7 +1,7 @@
 from aiohttp import web
 from aiohttp_session import get_session
 from app.settings.conf import AUTH0_CLIENT_ID, AUTH0_DOMAIN, AUTH0_SCOPE
-from app.utilities.auth import SESSION, get_random_string, get_redirect_url, authenticate, is_auth, reset_session
+from app.utilities.auth import SESSION, get_random_string, get_redirect_url, authenticate, get_is_auth, reset_session
 
 
 routes = web.RouteTableDef()
@@ -28,7 +28,8 @@ async def handler(request: web.Request) -> web.Response:
     session = await get_session(request)
     state = session[SESSION.STATE_KEY]
     if (state == state_param):
-        session[SESSION.USER_KEY] = await authenticate(code_param)
+        tokens = await authenticate(code_param)
+        session[SESSION.TOKENS_KEY] = tokens
         raise web.HTTPFound("/")
     else:
         raise web.HTTPBadRequest()
@@ -36,7 +37,8 @@ async def handler(request: web.Request) -> web.Response:
 
 @routes.get('/auth/logout')
 async def handler(request: web.Request) -> web.Response:
-    if await is_auth(request):
+    (is_auth, user) = await get_is_auth(request)
+    if is_auth:
         print("Is auth, logging out")
         await reset_session(request)
         raise web.HTTPFound("/")

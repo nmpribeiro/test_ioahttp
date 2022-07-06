@@ -2,19 +2,20 @@ from dataclasses import dataclass
 import json
 import random
 import string
+from typing import Any, Dict, Optional, Tuple, Union
 from aiohttp import web
 import aiohttp
-from aiohttp_session import get_session
+from aiohttp_session import Session, get_session
 from app.settings.conf import AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, HOST, PORT
 
 
 @dataclass
 class SessionKeyData:
-    USER_KEY: str
+    TOKENS_KEY: str
     STATE_KEY: str
 
 
-SESSION = SessionKeyData('user', 'auth0_state')
+SESSION = SessionKeyData('auth0_tokens', 'auth0_state')
 
 
 # https://auth0.com/docs/secure/attack-protection/state-parameters
@@ -33,7 +34,7 @@ def get_redirect_url():
     return f"http://{host}:{PORT}/auth/callback"
 
 
-async def authenticate(code: string):
+async def authenticate(code: string) -> Dict[str, Any]:
     async with aiohttp.ClientSession() as client:
         async with client.post(f"https://{AUTH0_DOMAIN}/oauth/token", json={
             "grant_type": "authorization_code",
@@ -43,37 +44,48 @@ async def authenticate(code: string):
             "redirect_uri": f"{get_redirect_url()}"
         }) as resp:
             payload = await resp.read()
-            json_res = json.loads(
+            token_object = json.loads(
                 payload.decode("utf-8").replace("'", '"'))
-
-            async with aiohttp.ClientSession() as client2:
-                headers = {
-                    "Authorization": f"{json_res['token_type']} {json_res['access_token']}"
-                }
-                async with client2.get(f"https://{AUTH0_DOMAIN}/userinfo", headers=headers) as resp:
-                    payload = await resp.read()
-                    user = json.loads(
-                        payload.decode("utf-8").replace("'", '"'))
-                    return user
+    return token_object
 
 
 async def reset_session(request: web.Request):
     session = await get_session(request)
     session[SESSION.STATE_KEY] = None
-    session[SESSION.USER_KEY] = None
-
-
-async def is_auth(request: web.Request) -> bool:
-    session = await get_session(request)
-    try:
-        return session[SESSION.USER_KEY] != None
-    except:
-        return False
+    session[SESSION.TOKENS_KEY] = None
 
 
 async def get_user(request: web.Request):
     session = await get_session(request)
+    tokens = get_tokens(session)
     try:
-        return session[SESSION.USER_KEY]
+        async with aiohttp.ClientSession() as client2:
+            headers = {
+                "Authorization": f"{tokens['token_type']} {tokens['access_token']}"
+            }
+            async with client2.get(f"https://{AUTH0_DOMAIN}/userinfo", headers=headers) as resp:
+                payload = await resp.read()
+                user = json.loads(
+                    payload.decode("utf-8").replace("'", '"'))
+                if "sub" in user:
+                    return user
+                else:
+                    return None
     except:
         return None
+
+
+def get_tokens(session: Session) -> Dict[str, Any]:
+    try:
+        return session[SESSION.TOKENS_KEY]
+    except:
+        return None
+
+
+async def get_is_auth(request: web.Request) -> Tuple[bool, Dict[str, Any]]:
+    user = await get_user(request)
+    is_auth = False
+    if (user != None):
+        is_auth = True
+
+    return (is_auth, user)
