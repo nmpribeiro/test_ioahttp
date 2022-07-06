@@ -59,6 +59,8 @@ async def get_user(request: web.Request):
     session = await get_session(request)
     tokens = get_tokens(session)
     try:
+        if tokens == None:
+            raise Exception("no tokens")
         async with aiohttp.ClientSession() as client2:
             headers = {
                 "Authorization": f"{tokens['token_type']} {tokens['access_token']}"
@@ -70,8 +72,9 @@ async def get_user(request: web.Request):
                 if "sub" in user:
                     return user
                 else:
-                    return None
+                    raise Exception("no user or user.sub attribute")
     except:
+        await reset_session(request)
         return None
 
 
