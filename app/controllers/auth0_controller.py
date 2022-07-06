@@ -1,7 +1,8 @@
+import json
 from aiohttp import web
 from aiohttp_session import get_session
-from app.settings.conf import AUTH0_CLIENT_ID, AUTH0_DOMAIN, AUTH0_SCOPE
-from app.utilities.auth import SESSION, get_random_string, get_redirect_url, authenticate, get_is_auth, reset_session
+from app.settings.conf import AUTH0_CLIENT_ID, AUTH0_DOMAIN, AUTH0_SCOPE, TEST_MODE
+from app.utilities.auth import SESSION, authenticate_test, get_random_string, get_redirect_url, authenticate, get_is_auth, reset_session
 
 
 routes = web.RouteTableDef()
@@ -17,6 +18,26 @@ async def handler(request: web.Request) -> web.Response:
         # &audience={AUTH0_AUDIENCE}
         f"https://{AUTH0_DOMAIN}/authorize?response_type=code&scope={AUTH0_SCOPE}&client_id={AUTH0_CLIENT_ID}&state={state}&redirect_uri={get_redirect_url()}"
     )
+
+
+@routes.post('/auth/login-test')
+async def handler(request: web.Request) -> web.Response:
+    # get email and pass
+    print("/auth/login-test >> test mode, route allowed" if TEST_MODE else "/auth/login-test >> route not allowed")
+    if TEST_MODE:
+        if request.body_exists:
+            body = await request.read()
+            data = json.loads(body)
+            email = data.get('email')
+            password = data.get('password')
+            if email != None and password != None:
+                # machine login
+                tokens = await authenticate_test(email, password)
+                session = await get_session(request)
+                session[SESSION.TOKENS_KEY] = tokens
+                raise web.HTTPFound("/")
+        raise web.HTTPBadRequest()
+    raise web.HTTPNotFound()
 
 
 @routes.get('/auth/callback')
